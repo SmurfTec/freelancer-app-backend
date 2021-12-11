@@ -10,14 +10,38 @@ const offerSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: [50, 'must NOT be less than or equal to 50'],
+      minlength: [20, 'must NOT be less than or equal to 20'],
     },
-    expectedDays: Number,
-    revisions: Number,
-    price: Number,
+    devRequest: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'DevRequest',
+    },
+    budget: {
+      type: Number,
+      required: [true, 'A Development Request Must have a Budget'],
+      validate: {
+        validator: function (el) {
+          return el >= 5;
+        },
+        message: `Budget can't be less than 5$`,
+      },
+    },
+    expectedDays: {
+      type: Number,
+      required: [true, 'A Development Request Must have Expected Days'],
+      validate: {
+        validator: function (el) {
+          return el >= 1;
+        },
+        message: `Expected Days can't be less than 1 day`,
+      },
+    },
+    revisions: { type: Number, default: 0 },
   },
   { timestamps: true }
 );
+
+offerSchema.index({ user: 1, devRequest: 1 }, { unique: true });
 
 offerSchema.pre(
   /^find/,

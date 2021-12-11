@@ -9,7 +9,9 @@ const categorySchema = new mongoose.Schema(
       trim: true,
       maxlength: [20, 'must be less than or equal to 20'],
     },
-    subCategories: [{ type: mongoose.Schema.Objectid, ref: 'SubCategory' }],
+    subCategories: [
+      { type: mongoose.Schema.Types.ObjectId, ref: 'SubCategory' },
+    ],
   },
   { timestamps: true }
 );

@@ -5,19 +5,21 @@ const User = require('./User');
 
 const freelancerSchema = new mongoose.Schema(
   {
+    userName: String,
     about: {
       type: String,
-      required: true,
       trim: true,
       minlength: [20, 'must be greater than 20 characters'],
     },
     country: String,
     activationLink: String,
+    // select: false, // TODO uncomment it late
+
     passwordResetToken: String,
     passwordResetExpires: Date,
     activated: {
       type: Boolean,
-      default: false,
+      default: true, //TODO make it false in production
     },
     isVerified: {
       type: Boolean,

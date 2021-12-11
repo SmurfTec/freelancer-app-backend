@@ -7,10 +7,13 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const path = require('path');
-const hpp = require('hpp');
 
 const userRouter = require('./routers/userRouter');
 const authRoutes = require('./routers/authRoutes');
+const devRequestsRouter = require('./routers/devRequestRouter');
+const categoryRouter = require('./routers/categoryRouter');
+const subCategoryRouter = require('./routers/subCategoryRouter');
+const offersRouter = require('./routers/offersRouter');
 
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 
@@ -31,7 +34,6 @@ app.set('views', path.join(__dirname, 'views'));
 //   }
 // }
 // app.use(cors(corsOptions))
- 
 
 app.use(express.json());
 
@@ -51,8 +53,7 @@ app.use(cors());
 const limiter = rateLimit({
   max: 100, //   max number of limits
   windowMs: 60 * 60 * 1000, // hour
-  message:
-    ' Too many req from this IP , please Try  again in an Hour ! ',
+  message: ' Too many req from this IP , please Try  again in an Hour ! ',
 });
 
 app.use('/api', limiter);
@@ -75,12 +76,14 @@ app.use((req, res, next) => {
 // routes
 app.use('/api/users', userRouter);
 app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoryRouter);
+app.use('/api/subCategories', subCategoryRouter);
+app.use('/api/devRequests', devRequestsRouter);
+app.use('/api/offers', offersRouter);
 
 // handling all (get,post,update,delete.....) unhandled routes
 app.all('*', (req, res, next) => {
-  next(
-    new AppError(`Can't find ${req.originalUrl} on the server`, 404)
-  );
+  next(new AppError(`Can't find ${req.originalUrl} on the server`, 404));
 });
 
 // error handling middleware
