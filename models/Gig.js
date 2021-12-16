@@ -6,7 +6,7 @@ const gigSchema = new mongoose.Schema(
     title: {
       type: String,
       required: [true, 'Gig must have title '],
-      maxlength: [20, 'must be less than or equal to 20'],
+      maxlength: [40, 'must be less than or equal to 20'],
     },
     description: {
       type: String,
@@ -14,9 +14,31 @@ const gigSchema = new mongoose.Schema(
       trim: true,
       minlength: [20, 'must NOT be less than or equal to 20'],
     },
-    tags: [String],
     images: [String],
-    services: [String],
+
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+    },
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SubCategory',
+    },
+    packages: [
+      {
+        name: {
+          type: String,
+          maxlength: [20, 'must be less than or equal to 20'],
+        },
+        description: {
+          type: String,
+          trim: true,
+          minlength: [10, 'must NOT be less than or equal to 10'],
+        },
+        expectedDays: Number,
+        price: Number,
+      },
+    ],
     reviews: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -34,21 +56,24 @@ const gigSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category',
+    status: {
+      type: String,
+      enum: ['pending', 'approved', 'rejected', 'archieved'],
+      default: 'pending',
     },
-    subCategory: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'SubCategory',
-    },
-    packages: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Package',
+      default: 'Freelancer',
     },
   },
   { timestamps: true }
 );
+
+gigSchema.pre(/^find/, function (next) {
+  // this points to current query
+  this.sort('-createdAt');
+  next();
+});
 
 const Gig = mongoose.model('Gig', gigSchema);
 module.exports = Gig;

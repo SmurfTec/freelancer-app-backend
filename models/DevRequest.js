@@ -53,7 +53,6 @@ const DevRequestSchema = new mongoose.Schema(
       ref: 'SubCategory',
       required: [true, 'A Development Request Must belong to a subCategory`'],
     },
-    tags: [String],
     // * We'll get devRequest's offer by /devRequests/offers route
     // offers: [
     //   {
@@ -67,7 +66,6 @@ const DevRequestSchema = new mongoose.Schema(
 
 DevRequestSchema.pre(/^find/, function (next) {
   // this points to current query
-  this;
   // .populate({
   //   path: 'offers',
   // })

@@ -5,13 +5,21 @@ const User = require('./User');
 
 const freelancerSchema = new mongoose.Schema(
   {
-    userName: String,
     about: {
       type: String,
       trim: true,
       minlength: [20, 'must be greater than 20 characters'],
     },
     country: String,
+    skills: [String],
+    gigs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Gig',
+      },
+    ],
+    ratingsQuantity: Number,
+    ratingsAverage: Number,
     activationLink: String,
     // select: false, // TODO uncomment it late
 
@@ -25,15 +33,6 @@ const freelancerSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    skills: [String],
-    gigs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Gig',
-      },
-    ],
-    ratingsQuantity: Number,
-    ratingsAverage: Number,
   },
   {
     toJSON: { virtuals: true }, // make virtual part of the output

@@ -117,6 +117,12 @@ exports.login = catchAsync(async (req, res, next) => {
       )
     );
 
+  if (user.__type === 'Freelancer') {
+    await User.populate(user, {
+      path: 'gigs',
+    });
+  }
+
   // if eveything is ok
   createsendToken(user, 200, res);
 });

@@ -14,6 +14,7 @@ const devRequestsRouter = require('./routers/devRequestRouter');
 const categoryRouter = require('./routers/categoryRouter');
 const subCategoryRouter = require('./routers/subCategoryRouter');
 const offersRouter = require('./routers/offersRouter');
+const gigRouter = require('./routers/gigRouter');
 
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 
@@ -80,6 +81,7 @@ app.use('/api/categories', categoryRouter);
 app.use('/api/subCategories', subCategoryRouter);
 app.use('/api/devRequests', devRequestsRouter);
 app.use('/api/offers', offersRouter);
+app.use('/api/gigs', gigRouter);
 
 // handling all (get,post,update,delete.....) unhandled routes
 app.all('*', (req, res, next) => {
