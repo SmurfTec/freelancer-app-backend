@@ -25,7 +25,7 @@ const reviewSchema = new mongoose.Schema(
     },
     seller: {
       type: mongoose.Schema.ObjectId,
-      ref: 'Customer',
+      ref: 'Freelancer',
       required: [true, 'Review must given by a Freelancer'],
     },
   },
