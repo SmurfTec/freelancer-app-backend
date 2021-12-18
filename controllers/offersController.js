@@ -1,4 +1,5 @@
 const DevRequest = require('../models/DevRequest');
+const Gig = require('../models/Gig');
 const Offer = require('../models/Offer');
 const Offers = require('../models/Offer');
 const AppError = require('../utils/appError');
@@ -20,6 +21,21 @@ exports.setDevRequestId = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllOffers = catchAsync(async (req, res, next) => {
+  const { devRequestId } = req.params;
+  console.log(`req.dataFilter`, req.dataFilter);
+  console.log(`req.user._id`, req.user._id);
+
+  // ! Only owner can view offers against his devReq's offers
+  const devRequest = await DevRequest.findOne({
+    _id: devRequestId,
+    user: req.user._id,
+  });
+
+  if (!devRequest)
+    return next(
+      new AppError(`Can't find Development Request with id ${devRequestId}`)
+    );
+
   const offers = await Offers.find(req.dataFilter || {});
 
   res.status(200).json({
@@ -30,8 +46,10 @@ exports.getAllOffers = catchAsync(async (req, res, next) => {
 });
 
 exports.addNewOffer = catchAsync(async (req, res, next) => {
-  const { description, budget, expectedDays } = req.body;
+  const { description, budget, expectedDays, gigId } = req.body;
   const { devRequestId } = req.params;
+
+  console.log(`devRequestId`, devRequestId);
   const devRequest = await DevRequest.findOne({
     _id: devRequestId,
     status: 'approved',
@@ -39,9 +57,18 @@ exports.addNewOffer = catchAsync(async (req, res, next) => {
   if (!devRequest)
     return next(
       new AppError(
-        `No Development Request Found against id ${devRequestId}`,
+        `No Approved Development Request Found against id ${devRequestId}`,
         404
       )
+    );
+
+  const gig = await Gig.findOne({
+    _id: gigId,
+    status: 'approved',
+  });
+  if (!gig)
+    return next(
+      new AppError(`No Approved Gig  Found against id ${gigId}`, 404)
     );
 
   const offer = await Offers.create({

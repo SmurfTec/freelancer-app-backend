@@ -58,7 +58,7 @@ const gigSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'approved', 'rejected', 'archieved'],
+      enum: ['pending', 'approved', 'rejected'],
       default: 'pending',
     },
     user: {

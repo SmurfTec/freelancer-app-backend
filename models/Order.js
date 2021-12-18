@@ -2,23 +2,30 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema(
   {
-    // * seller will be order.offer.user
     buyer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Freelancer',
     },
-    dueDate: Date,
+    seller: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Freelancer',
+    },
     offer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Offer',
+      ref: 'Freelancer',
     },
+    submission: String, // * a zip file
+    deadline: Date, // * in order accepts , deadline = offer.expectedDays
     // * Payments or maybe payment
-    payments: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Payment',
-      },
-    ],
+    status: {
+      type: String,
+      enum: ['active', 'delivered', 'notAccepted', 'completed'],
+      default: 'active',
+    },
+    payment: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Payment',
+    },
   },
   { timestamps: true }
 );

@@ -6,11 +6,20 @@ const messageSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
-    receiver: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
+    // * Receiver will be 2nd person of chat
+    // receiver: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: 'User',
+    // },
     text: String,
+    isOffer: {
+      type: Boolean,
+      default: false,
+    },
+    offer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Offer',
+    },
   },
   { timestamps: true }
 );

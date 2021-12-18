@@ -1,6 +1,7 @@
 const express = require('express');
 
 const offersController = require('../controllers/offersController');
+const isVerified = require('../middlewares/isVerified');
 const protect = require('../middlewares/protect');
 const restrictTo = require('../middlewares/restrictTo');
 
@@ -12,8 +13,9 @@ router
   .route('/')
   .get(offersController.setDevRequestId, offersController.getAllOffers)
   .post(
-    offersController.setDevRequestId,
+    isVerified,
     restrictTo('seller'),
+    offersController.setDevRequestId,
     offersController.addNewOffer
   );
 

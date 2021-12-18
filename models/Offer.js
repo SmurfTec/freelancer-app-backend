@@ -16,6 +16,10 @@ const offerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'DevRequest',
     },
+    gig: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Gig',
+    },
     budget: {
       type: Number,
       required: [true, 'A Development Request Must have a Budget'],
@@ -36,26 +40,26 @@ const offerSchema = new mongoose.Schema(
         message: `Expected Days can't be less than 1 day`,
       },
     },
-    revisions: { type: Number, default: 0 },
+    status: {
+      type: String,
+      enum: ['pending', 'accepted', 'rejected'],
+      default: 'pending',
+    },
   },
   { timestamps: true }
 );
 
 offerSchema.index({ user: 1, devRequest: 1 }, { unique: true });
 
-offerSchema.pre(
-  /^find/,
-  function (next) {
-    // this points to current query
-    this.populate({
-      path: 'user',
-      select: 'name email photo role',
-    });
+offerSchema.pre(/^find/, function (next) {
+  // this points to current query
+  this.sort('-createdAt').populate({
+    path: 'user',
+    select: 'name email photo role',
+  });
 
-    next();
-  },
-  { timestamps: true }
-);
+  next();
+});
 
 const Offer = mongoose.model('Offer', offerSchema);
 module.exports = Offer;
