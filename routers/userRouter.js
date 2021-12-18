@@ -11,19 +11,19 @@ router.use(protect); //  protect all router which are comming after this middlew
 router
   .route('/me')
   .get(userController.getMe)
-  .patch(userController.setMe, userController.updateUser);
+  .patch(userController.setMe, userController.updateMe);
 
 router.patch('/updatePassword', authController.updatePassword);
 
-router
-  .route('/')
-  .get(userController.getAllUsers)
-  .post(restrictTo('admin'), userController.createUser);
+router.route('/').get(userController.getAllUsers);
 
 router
   .route('/:id')
   .get(userController.getUser)
-  .patch(restrictTo('admin'), userController.updateUser)
   .delete(restrictTo('admin'), userController.deleteUser);
+
+router
+  .route('/verify/:id/:status')
+  .patch(restrictTo('admin'), userController.manageVerification);
 
 module.exports = router;

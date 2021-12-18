@@ -29,13 +29,12 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Please provide a password'],
       minlength: 8,
       select: false,
+      required: [true, 'Please provide a password'],
     },
     passwordConfirm: {
       type: String,
-      required: [true, 'Please confirm your password'],
       validate: {
         // This only works on CREATE and SAVE!!!
         validator: function (el) {
@@ -43,6 +42,7 @@ const userSchema = new mongoose.Schema(
         },
         message: 'Passwords are not the same!',
       },
+      // required: [true, 'Please confirm your password'],
     },
   },
   {

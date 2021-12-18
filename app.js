@@ -68,6 +68,7 @@ app.use(mongoSanitize()); //   filter out the dollar signs protect from  query i
 
 // Data sanitization against XSS
 app.use(xss()); //    protect from molision code coming from html
+
 // testing middleware
 app.use((req, res, next) => {
   console.log('this is a middleware');

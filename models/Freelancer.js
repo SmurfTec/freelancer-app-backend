@@ -25,10 +25,13 @@ const freelancerSchema = new mongoose.Schema({
     type: Boolean,
     default: true, //TODO make it false in production
   },
-  isVerified: {
-    type: Boolean,
-    default: false,
+  // only check when user is a seller
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending',
   },
+
   activationLink: String,
   // select: false, // TODO uncomment it late
 });
