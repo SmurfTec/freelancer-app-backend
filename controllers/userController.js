@@ -104,10 +104,14 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   });
 });
 
+// admin only can approved or reject the User as a seller
+
 exports.manageVerification = catchAsync(async (req, res, next) => {
-  const { id, status } = req.params;
-  console.log('id :>> ', id);
-  console.log('status :>> ', status);
+  const { id } = req.params;
+  const { status } = req.body;
+
+  // console.log('id :>> ', id);
+  // console.log('status :>> ', status);
 
   const user = await User.findById(id);
   if (!user)

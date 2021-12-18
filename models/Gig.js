@@ -5,7 +5,7 @@ const gigSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      default: 'Freelancer',
+      ref: 'Freelancer',
     },
     title: {
       type: String,
@@ -48,9 +48,10 @@ const gigSchema = new mongoose.Schema(
         ref: 'Review',
       },
     ],
+    //* will be calculated when buyer create a new review on an order
     ratingsAverage: {
       type: Number,
-      default: 4.5,
+      default: 1,
       min: [1, 'Rating must be above 1.0'],
       max: [5, 'Rating must be below 5.0'],
       set: (val) => Math.round(val * 10) / 10, // 4.666666, 46.6666, 47, 4.7
@@ -59,6 +60,9 @@ const gigSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    //* only approved gigs will be public
+
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],

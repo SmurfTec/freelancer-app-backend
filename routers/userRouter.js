@@ -23,7 +23,7 @@ router
   .delete(restrictTo('admin'), userController.deleteUser);
 
 router
-  .route('/verify/:id/:status')
+  .route('/verify/:id')
   .patch(restrictTo('admin'), userController.manageVerification);
 
 module.exports = router;
