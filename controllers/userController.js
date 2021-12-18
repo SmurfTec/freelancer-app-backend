@@ -21,10 +21,10 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await User.find();
 
   // SEND RESPONSE
+
   res.status(200).json({
     status: 'success',
     results: users.length,
-
     users,
   });
 });
@@ -57,21 +57,32 @@ exports.updateUser = catchAsync(async (req, res, next) => {
   let updatedUser;
   if (req.user.__type === 'Freelancer') {
     console.log('freelancer');
-    updatedUser = await Freelancer.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    updatedUser = await Freelancer.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
   } else {
     console.log('user');
-    updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
   }
 
   if (!updatedUser)
     return next(
-      new AppError(`Can't find any user with id ${req.params.id}`, 404)
+      new AppError(
+        `Can't find any user with id ${req.params.id}`,
+        404
+      )
     );
 
   res.status(200).json({
@@ -98,7 +109,9 @@ exports.getUser = catchAsync(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
   if (!user)
-    return next(new AppError(`No User found against id ${req.params.id}`, 404));
+    return next(
+      new AppError(`No User found against id ${req.params.id}`, 404)
+    );
 
   res.status(200).json({
     status: 'success',
@@ -110,7 +123,9 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   const deletedUser = await User.findByIdAndDelete(req.params.id);
 
   if (!deletedUser)
-    return next(new AppError(`No User found against id ${req.params.id}`, 404));
+    return next(
+      new AppError(`No User found against id ${req.params.id}`, 404)
+    );
 
   res.status(200).json({
     status: 'success',

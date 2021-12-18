@@ -9,7 +9,10 @@ const DevRequestSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: [true, 'A Development Request Must have a Description'],
+      required: [
+        true,
+        'A Development Request Must have a Description',
+      ],
       minlength: [20, 'Description must be at least 20 characters'],
     },
     budget: {
@@ -24,7 +27,10 @@ const DevRequestSchema = new mongoose.Schema(
     },
     expectedDays: {
       type: Number,
-      required: [true, 'A Development Request Must have Expected Days'],
+      required: [
+        true,
+        'A Development Request Must have Expected Days',
+      ],
       validate: {
         validator: function (el) {
           return el >= 1;
@@ -32,12 +38,7 @@ const DevRequestSchema = new mongoose.Schema(
         message: `Expected Days can't be less than 1 day`,
       },
     },
-    images: [
-      {
-        _id: String,
-        url: String,
-      },
-    ],
+    files: [String],
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],
@@ -46,12 +47,18 @@ const DevRequestSchema = new mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
-      required: [true, 'A Development Request Must belong to a category`'],
+      required: [
+        true,
+        'A Development Request Must belong to a category`',
+      ],
     },
     subCategory: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'SubCategory',
-      required: [true, 'A Development Request Must belong to a subCategory`'],
+      required: [
+        true,
+        'A Development Request Must belong to a subCategory`',
+      ],
     },
     // * We'll get devRequest's offer by /devRequests/offers route
     // offers: [

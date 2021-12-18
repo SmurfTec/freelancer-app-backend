@@ -1,52 +1,41 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
-
 const User = require('./User');
 
-const freelancerSchema = new mongoose.Schema(
-  {
-    about: {
-      type: String,
-      trim: true,
-      minlength: [20, 'must be greater than 20 characters'],
-    },
-    country: String,
-    skills: [String],
-    gigs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Gig',
-      },
-    ],
-    ratingsQuantity: Number,
-    ratingsAverage: Number,
-    activationLink: String,
-    // select: false, // TODO uncomment it late
-
-    passwordResetToken: String,
-    passwordResetExpires: Date,
-    activated: {
-      type: Boolean,
-      default: true, //TODO make it false in production
-    },
-    isVerified: {
-      type: Boolean,
-      default: false,
-    },
+const freelancerSchema = new mongoose.Schema({
+  about: {
+    type: String,
+    trim: true,
+    minlength: [20, 'must be greater than 20 characters'],
   },
-  {
-    toJSON: { virtuals: true }, // make virtual part of the output
-    toObject: { virtuals: true },
-  }
-);
+  country: { type: String, trim: true },
+  skills: [String],
+  ratingsQuantity: Number,
+  ratingsAverage: Number,
+  gigs: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Gig',
+    },
+  ],
 
-// virtual populate => it shows the review which are belong to a particular freelancer
-freelancerSchema.virtual('reviews', {
-  ref: 'Review',
-  foreignField: 'freelancer', //  reference of the current modal
-  localField: '_id', //  current modal id
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+  activated: {
+    type: Boolean,
+    default: true, //TODO make it false in production
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+  activationLink: String,
+  // select: false, // TODO uncomment it late
 });
 
-const freelancerModel = User.discriminator('Freelancer', freelancerSchema);
+const freelancerModel = User.discriminator(
+  'Freelancer',
+  freelancerSchema
+);
 
 module.exports = freelancerModel;

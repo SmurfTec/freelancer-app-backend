@@ -3,6 +3,10 @@ const validator = require('validator');
 
 const gigSchema = new mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: 'Freelancer',
+    },
     title: {
       type: String,
       required: [true, 'Gig must have title '],
@@ -15,7 +19,6 @@ const gigSchema = new mongoose.Schema(
       minlength: [20, 'must NOT be less than or equal to 20'],
     },
     images: [String],
-
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
@@ -60,10 +63,6 @@ const gigSchema = new mongoose.Schema(
       type: String,
       enum: ['pending', 'approved', 'rejected'],
       default: 'pending',
-    },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      default: 'Freelancer',
     },
   },
   { timestamps: true }

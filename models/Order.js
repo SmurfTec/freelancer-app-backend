@@ -14,9 +14,11 @@ const orderSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Freelancer',
     },
+
     submission: String, // * a zip file
     deadline: Date, // * in order accepts , deadline = offer.expectedDays
     // * Payments or maybe payment
+
     status: {
       type: String,
       enum: ['active', 'delivered', 'notAccepted', 'completed'],

@@ -12,6 +12,7 @@ const offerSchema = new mongoose.Schema(
       trim: true,
       minlength: [20, 'must NOT be less than or equal to 20'],
     },
+    // only in devRequest
     devRequest: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'DevRequest',
@@ -32,7 +33,10 @@ const offerSchema = new mongoose.Schema(
     },
     expectedDays: {
       type: Number,
-      required: [true, 'A Development Request Must have Expected Days'],
+      required: [
+        true,
+        'A Development Request Must have Expected Days',
+      ],
       validate: {
         validator: function (el) {
           return el >= 1;
@@ -40,6 +44,7 @@ const offerSchema = new mongoose.Schema(
         message: `Expected Days can't be less than 1 day`,
       },
     },
+    // only in chat
     status: {
       type: String,
       enum: ['pending', 'accepted', 'rejected'],
@@ -49,13 +54,11 @@ const offerSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-offerSchema.index({ user: 1, devRequest: 1 }, { unique: true });
-
 offerSchema.pre(/^find/, function (next) {
   // this points to current query
   this.sort('-createdAt').populate({
     path: 'user',
-    select: 'name email photo role',
+    select: 'fullName email photo role',
   });
 
   next();

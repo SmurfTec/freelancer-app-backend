@@ -54,7 +54,8 @@ app.use(cors());
 const limiter = rateLimit({
   max: 100, //   max number of limits
   windowMs: 60 * 60 * 1000, // hour
-  message: ' Too many req from this IP , please Try  again in an Hour ! ',
+  message:
+    ' Too many req from this IP , please Try  again in an Hour ! ',
 });
 
 app.use('/api', limiter);
@@ -67,7 +68,6 @@ app.use(mongoSanitize()); //   filter out the dollar signs protect from  query i
 
 // Data sanitization against XSS
 app.use(xss()); //    protect from molision code coming from html
-
 // testing middleware
 app.use((req, res, next) => {
   console.log('this is a middleware');
@@ -75,17 +75,20 @@ app.use((req, res, next) => {
 });
 
 // routes
+
 app.use('/api/users', userRouter);
 app.use('/api/auth', authRoutes);
-app.use('/api/categories', categoryRouter);
-app.use('/api/subCategories', subCategoryRouter);
 app.use('/api/devRequests', devRequestsRouter);
 app.use('/api/offers', offersRouter);
 app.use('/api/gigs', gigRouter);
+app.use('/api/categories', categoryRouter);
+app.use('/api/subCategories', subCategoryRouter);
 
 // handling all (get,post,update,delete.....) unhandled routes
 app.all('*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on the server`, 404));
+  next(
+    new AppError(`Can't find ${req.originalUrl} on the server`, 404)
+  );
 });
 
 // error handling middleware

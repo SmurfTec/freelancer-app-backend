@@ -23,10 +23,10 @@ const reviewSchema = new mongoose.Schema(
       ref: 'Freelancer',
       required: [true, 'Review must belong to a Freelancer'],
     },
-    seller: {
+    order: {
       type: mongoose.Schema.ObjectId,
-      ref: 'Freelancer',
-      required: [true, 'Review must given by a Freelancer'],
+      ref: 'Order',
+      required: [true, 'Review must given to an Order'],
     },
   },
   {
@@ -36,9 +36,7 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-//  each user can review each seller only once so applying restriction
-//  and means each combination of seller and customer always unique
-reviewSchema.index({ buyer: 1, seller: 1 }, { unique: true });
+reviewSchema.index({ buyer: 1, order: 1 }, { unique: true });
 
 reviewSchema.statics.cal_averageRatings = async function (sellerId) {
   // id for which the current review belong to
