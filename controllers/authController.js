@@ -68,12 +68,12 @@ exports.signup = catchAsync(async (req, res, next) => {
     template: 'signupEmail.ejs',
     url: activationURL,
   });
-  res.status(200).json({
-    status: 'Success',
-    message: `Email Verification Link Successfully Sent to you email ${user.email}`,
-    user,
-  });
-  // createsendToken(user, 201, res);
+  // res.status(200).json({
+  //   status: 'Success',
+  //   message: `Email Verification Link Successfully Sent to you email ${user.email}`,
+  //   user,
+  // });
+  createsendToken(user, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
