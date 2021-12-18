@@ -11,7 +11,7 @@ router.use(protect); //  protect all router which are comming after this middlew
 router
   .route('/me')
   .get(userController.getMe)
-  .patch(userController.getMe, userController.updateUser);
+  .patch(userController.setMe, userController.updateUser);
 
 router.patch('/updatePassword', authController.updatePassword);
 
