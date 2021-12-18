@@ -39,11 +39,6 @@ const DevRequestSchema = new mongoose.Schema(
       },
     },
     files: [String],
-    status: {
-      type: String,
-      enum: ['pending', 'approved', 'rejected'],
-      default: 'pending',
-    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',
@@ -60,13 +55,6 @@ const DevRequestSchema = new mongoose.Schema(
         'A Development Request Must belong to a subCategory`',
       ],
     },
-    // * We'll get devRequest's offer by /devRequests/offers route
-    // offers: [
-    //   {
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Offer',
-    //   },
-    // ],
   },
   { timestamps: true }
 );

@@ -4,17 +4,24 @@ const SubCategory = require('../models/SubCategory');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
-exports.getMyData = catchAsync(async (req, res, next) => {
-  req.dataFilter = {
+//* only buyer
+exports.createDevRequest = catchAsync(async (req, res, next) => {
+  const devrequest = await DevRequest.create({
+    ...req.body,
     user: req.user._id,
-  };
-  next();
+  });
+
+  res.status(201).json({
+    status: 'success',
+    devrequest,
+  });
 });
 
-exports.getAllDevRequests = catchAsync(async (req, res, next) => {
-  let query = DevRequest.find(req.dataFilter || {});
-  if (req.query.status) query.find({ status: req.query.status });
+//* only seller
 
+exports.getAllDevRequests = catchAsync(async (req, res, next) => {
+  let query = DevRequest.find();
+  if (req.query.status) query.find({ status: req.query.status });
   query
     .populate({
       path: 'user',
@@ -36,27 +43,32 @@ exports.getAllDevRequests = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.addNewDevRequest = catchAsync(async (req, res, next) => {
-  const { description, budget, expectedDays, categoryId, subCategoryId } =
-    req.body;
+//* only buyer
+exports.getMyDevRequests = catchAsync(async (req, res, next) => {
+  let devrequests = await DevRequest.find({ user: req.user._id })
+    .populate({
+      path: 'user',
+      select: 'name email photo role',
+    })
+    .populate('category')
+    .populate('subCategory');
 
-  const devrequest = await DevRequest.create({
-    user: req.user._id,
-    description,
-    budget,
-    expectedDays,
-    category: categoryId,
-    subCategory: subCategoryId,
-  });
-
-  res.status(201).json({
+  res.status(200).json({
     status: 'success',
-    devrequest,
+    results: devrequests.length,
+    devrequests,
   });
 });
 
+//* only a person who created/buyer can get single devRequest
+
 exports.getDevRequest = catchAsync(async (req, res, next) => {
-  const devrequest = await DevRequest.findById(req.params.id)
+  const { id } = req.params;
+  const devrequest = await DevRequest.findById({
+    user: req.user._id,
+    _id: id,
+  })
+    // const devrequest = await DevRequest.findById({ _id: id })
     .populate({
       path: 'user',
       select: 'name email photo role',
@@ -66,55 +78,10 @@ exports.getDevRequest = catchAsync(async (req, res, next) => {
 
   if (!devrequest)
     return next(
-      new AppError(`Can't find devrequest for id ${req.params.id}`, 404)
+      new AppError(`Can't find devrequest for id ${id}`, 404)
     );
 
-  res.status(200).json({
-    status: 'success',
-    devrequest,
-  });
-});
-
-exports.updateDevRequest = catchAsync(async (req, res, next) => {
-  const devrequest = await DevRequest.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-
-  if (!devrequest)
-    return next(
-      new AppError(`Can't find devrequest for id ${req.params.id}`, 404)
-    );
-
-  res.status(200).json({
-    status: 'success',
-    devrequest,
-  });
-});
-
-exports.changeStatus = catchAsync(async (req, res, next) => {
-  const { status } = req.body;
-  if (!status) return next(new AppError(`Provide Status with Request `, 400));
-
-  const devrequest = await DevRequest.findByIdAndUpdate(
-    req.params.id,
-    {
-      status,
-    },
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
-
-  if (!devrequest)
-    return next(
-      new AppError(`Can't find devrequest for id ${req.params.id}`, 404)
-    );
+  //* return all the offer created on single devrequest
 
   res.status(200).json({
     status: 'success',
@@ -136,7 +103,10 @@ exports.deleteDevRequest = catchAsync(async (req, res, next) => {
 
   if (!devrequest)
     return next(
-      new AppError(`Can't find devrequest for id ${req.params.id}`, 404)
+      new AppError(
+        `Can't find devrequest for id ${req.params.id}`,
+        404
+      )
     );
 
   res.status(200).json({

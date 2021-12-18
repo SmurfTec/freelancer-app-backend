@@ -30,12 +30,7 @@ exports.createGig = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllGigs = catchAsync(async (req, res, next) => {
-  let gigs;
-  if (req.user.role === 'admin') {
-    gigs = await Gig.find();
-  } else {
-    gigs = await Gig.find({ status: 'approved' });
-  }
+  let gigs = await Gig.find();
 
   res.status(200).json({
     status: 'success',
@@ -108,30 +103,6 @@ exports.deleteGig = catchAsync(async (req, res, next) => {
   const user = await Freelancer.findById(gig.user);
   user.gigs = user.gigs.filter((el) => el.toString() !== id);
   await user.save({ validateBeforeSave: false });
-
-  res.status(200).json({
-    status: 'success',
-    gig,
-  });
-});
-
-//* status (pending , approved , rejected)
-
-exports.manageGigStatus = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-  const { status } = req.body;
-  console.log('i am here');
-  if (!status)
-    return next(new AppError(`Provide Status with Request `, 400));
-
-  const gig = await Gig.findById(id);
-  if (!gig)
-    return next(
-      new AppError(`Can't find gig for id ${req.params.id}`, 404)
-    );
-
-  gig.status = status;
-  await gig.save();
 
   res.status(200).json({
     status: 'success',

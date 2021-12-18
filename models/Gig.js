@@ -60,14 +60,6 @@ const gigSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-
-    //* only approved gigs will be public
-
-    status: {
-      type: String,
-      enum: ['pending', 'approved', 'rejected'],
-      default: 'pending',
-    },
   },
   { timestamps: true }
 );

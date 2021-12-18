@@ -27,8 +27,4 @@ router
   .patch(gigController.updateGig)
   .delete(gigController.deleteGig);
 
-router
-  .route('/verify/:id')
-  .patch(restrictTo('admin'), gigController.manageGigStatus);
-
 module.exports = router;
