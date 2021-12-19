@@ -10,9 +10,7 @@ exports.setDevRequestId = catchAsync(async (req, res, next) => {
 
   if (!devRequestId)
     return next(
-      new AppError(
-        `Provide Dev Request id with request for its offer`
-      )
+      new AppError(`Provide Dev Request id with request for its offer`)
     );
 
   req.dataFilter = {
@@ -20,6 +18,18 @@ exports.setDevRequestId = catchAsync(async (req, res, next) => {
   };
 
   next();
+});
+
+exports.getMyOffers = catchAsync(async (req, res, next) => {
+  const offers = await Offer.find({
+    user: req.user._id,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    results: offers.length,
+    offers,
+  });
 });
 
 exports.getAllOffers = catchAsync(async (req, res, next) => {
@@ -35,9 +45,7 @@ exports.getAllOffers = catchAsync(async (req, res, next) => {
 
   if (!devRequest)
     return next(
-      new AppError(
-        `Can't find Development Request with id ${devRequestId}`
-      )
+      new AppError(`Can't find Development Request with id ${devRequestId}`)
     );
 
   const offers = await Offer.find(req.dataFilter || {});
@@ -73,12 +81,23 @@ exports.addNewOffer = catchAsync(async (req, res, next) => {
       new AppError(`No Approved Gig  Found against id ${gigId}`, 404)
     );
 
+  // * If already made offer on that devReq, then restrict him
+  let alreadyOffer = await Offer.findOne({
+    user: req.user._id,
+    devRequest: devRequestId,
+  });
+  if (alreadyOffer)
+    return next(
+      new AppError(`YOu already made offer on that development Request`)
+    );
+
   const offer = await Offer.create({
     user: req.user._id,
     devRequest: devRequestId,
     description,
     budget,
     expectedDays,
+    gig: gigId,
   });
 
   await Offer.populate(offer, 'devRequest');
@@ -97,9 +116,7 @@ exports.getOffer = catchAsync(async (req, res, next) => {
   const offers = await Offer.findById(req.params.id);
 
   if (!offers)
-    return next(
-      new AppError(`Can't find offer for id ${req.params.id}`, 404)
-    );
+    return next(new AppError(`Can't find offer for id ${req.params.id}`, 404));
 
   res.status(200).json({
     status: 'success',
@@ -113,13 +130,16 @@ exports.manageOffer = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  const offer = await Offer.findById(id);
+  console.log('hello');
+
+  const offer = await Offer.findOne({ _id: id, status: 'pending' });
   if (!offer)
-    return next(new AppError(`Can't find offer for id ${id}`, 404));
+    return next(new AppError(`Can't find any pending offer for id ${id}`, 404));
 
   offer.status = status;
   await offer.save();
 
+  let order;
   if (status === 'accepted') {
     const days = offer.expectedDays;
     let deadline = new Date();
@@ -127,10 +147,10 @@ exports.manageOffer = catchAsync(async (req, res, next) => {
 
     // start the order after accepting the offer
 
-    const order = await Order.create({
+    order = await Order.create({
       buyer: req.user._id,
       seller: offer.user,
-      offer: offer,
+      offer: offer._id,
       deadline: deadline,
     });
   }
@@ -138,5 +158,6 @@ exports.manageOffer = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     offer,
+    order,
   });
 });

@@ -8,6 +8,8 @@ const catchAsync = require('../utils/catchAsync');
 exports.createDevRequest = catchAsync(async (req, res, next) => {
   const devrequest = await DevRequest.create({
     ...req.body,
+    category: req.body.categoryId,
+    subCategory: req.body.subCategoryId,
     user: req.user._id,
   });
 
@@ -77,9 +79,7 @@ exports.getDevRequest = catchAsync(async (req, res, next) => {
     .populate('subCategory');
 
   if (!devrequest)
-    return next(
-      new AppError(`Can't find devrequest for id ${id}`, 404)
-    );
+    return next(new AppError(`Can't find devrequest for id ${id}`, 404));
 
   //* return all the offer created on single devrequest
 
@@ -103,10 +103,7 @@ exports.deleteDevRequest = catchAsync(async (req, res, next) => {
 
   if (!devrequest)
     return next(
-      new AppError(
-        `Can't find devrequest for id ${req.params.id}`,
-        404
-      )
+      new AppError(`Can't find devrequest for id ${req.params.id}`, 404)
     );
 
   res.status(200).json({

@@ -12,7 +12,7 @@ const orderSchema = new mongoose.Schema(
     },
     offer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Freelancer',
+      ref: 'Offer',
     },
     submission: String, // * a zip file
     deadline: Date, // * in order accepts , deadline = offer.expectedDays

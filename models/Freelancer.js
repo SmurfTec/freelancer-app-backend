@@ -11,8 +11,17 @@ const freelancerSchema = new mongoose.Schema({
 
   country: { type: String, trim: true },
   skills: [String],
-  ratingsQuantity: Number,
-  ratingsAverage: Number,
+  ratingsAverage: {
+    type: Number,
+    default: 1,
+    min: [1, 'Rating must be above 1.0'],
+    max: [5, 'Rating must be below 5.0'],
+    set: (val) => Math.round(val * 10) / 10, // 4.666666, 46.6666, 47, 4.7
+  },
+  ratingsQuantity: {
+    type: Number,
+    default: 0,
+  },
 
   gigs: [
     {
@@ -38,9 +47,6 @@ const freelancerSchema = new mongoose.Schema({
   // select: false, // TODO uncomment it late
 });
 
-const freelancerModel = User.discriminator(
-  'Freelancer',
-  freelancerSchema
-);
+const freelancerModel = User.discriminator('Freelancer', freelancerSchema);
 
 module.exports = freelancerModel;

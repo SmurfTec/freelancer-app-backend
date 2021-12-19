@@ -66,9 +66,9 @@ reviewSchema.statics.cal_averageRatings = async function (sellerId) {
 };
 
 //  each time new review is created calculate/update the nRating,avdRating
-reviewSchema.post('save', function () {
-  this.constructor.cal_averageRatings(this.seller);
-});
+// reviewSchema.post('save', function () {
+//   this.constructor.cal_averageRatings(this.seller);
+// });
 
 const Review = mongoose.model('Review', reviewSchema);
 

@@ -9,6 +9,15 @@ const router = express.Router({ mergeParams: true });
 
 router.use(protect);
 
+//!  ?
+router.get(
+  '/me',
+
+  offersController.getMyOffers
+);
+
+router.route('/:id').get(offersController.getOffer);
+
 router
   .route('/')
   .get(
@@ -22,18 +31,5 @@ router
     offersController.setDevRequestId,
     offersController.addNewOffer
   );
-
-//!  ?
-router.get(
-  '/me',
-  (req, res, next) => {
-    req.dataFilter = { user: req.user._id };
-    next();
-  },
-
-  offersController.getAllOffers
-);
-
-router.route('/:id').get(offersController.getOffer);
 
 module.exports = router;

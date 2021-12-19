@@ -60,10 +60,8 @@ const DevRequestSchema = new mongoose.Schema(
 );
 
 DevRequestSchema.pre(/^find/, function (next) {
-  // this points to current query
-  // .populate({
-  //   path: 'offers',
-  // })
+  this.sort('-createdAt')
+  
 
   next();
 });

@@ -4,9 +4,7 @@ const gigController = require('../controllers/gigController');
 const isVerified = require('../middlewares/isVerified');
 const protect = require('../middlewares/protect');
 const restrictTo = require('../middlewares/restrictTo');
-const {
-  validateCategories,
-} = require('../middlewares/validateCategories');
+const { validateCategories } = require('../middlewares/validateCategories');
 
 const router = express.Router({ mergeParams: true });
 

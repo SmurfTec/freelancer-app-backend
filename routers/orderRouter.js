@@ -13,12 +13,9 @@ router.route('/me').get(orderController.getMyOrders);
 
 router.route('/:id').get(orderController.getOrder);
 
-router
-  .route('/deliverorder/:id')
-  .patch(restrictTo('seller'), orderController.deliverOrder);
-
-router
-  .route('/manageorder/:id')
-  .patch(restrictTo('buyer'), orderController.manageOrder);
+// * User can switch to different role , so at that time he maybe seller
+// * So no need to restrictTo
+router.route('/deliverorder/:id').patch(orderController.deliverOrder);
+router.route('/manageorder/:id').patch(orderController.manageOrder);
 
 module.exports = router;
