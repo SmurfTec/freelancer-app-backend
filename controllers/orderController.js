@@ -4,6 +4,21 @@ const catchAsync = require('../utils/catchAsync');
 
 exports.getAllOrders = catchAsync(async (req, res, next) => {
   const orders = await Order.find();
+
+  res.status(200).json({
+    status: 'success',
+    orders,
+  });
+});
+
+exports.getMyOrders = catchAsync(async (req, res, next) => {
+  const orders = await Order.find({
+    $or: [{ buyer: req.user._id }, { seller: req.user._id }],
+  })
+    .populate('offer')
+    .populate('buyer', 'name photo ')
+    .populate('seller', 'name photo ');
+
   res.status(200).json({
     status: 'success',
     orders,
@@ -11,29 +26,76 @@ exports.getAllOrders = catchAsync(async (req, res, next) => {
 });
 
 exports.getOrder = catchAsync(async (req, res, next) => {
-  const Order = await Order.findById(req.params.id);
+  const order = await Order.findById(req.params.id)
+    .populate('offer')
+    .populate('buyer', 'name photo ')
+    .populate('seller', 'name photo ');
 
-  if (!Order)
+  if (!order)
     return next(
       new AppError(`Can't find Order for id ${req.params.id}`, 404)
     );
 
   res.status(200).json({
     status: 'success',
-    Order,
+    order,
   });
 });
 
-exports.manageorder = catchAsync(async (req, res, next) => {
-  const Order = await Order.findById(req.params.id);
+//* submit Order only seller
 
-  if (!Order)
+exports.deliverOrder = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+
+  const order = await Order.findById({
+    seller: req.user._id,
+    _id: id,
+  });
+  if (!order)
     return next(
       new AppError(`Can't find Order for id ${req.params.id}`, 404)
     );
 
+  order.status = 'delivered';
+  await order.save();
+
   res.status(200).json({
     status: 'success',
-    Order,
+    order,
+  });
+});
+
+//* manage order only buyer
+
+exports.manageOrder = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { status } = req.body;
+
+  const order = await Order.findOne({
+    buyer: req.user._id,
+    _id: id,
+  });
+
+  if (!order)
+    return next(
+      new AppError(`Can't find Order for id ${req.params.id}`, 404)
+    );
+
+  if (order.status !== 'delivered') {
+    return next(
+      new AppError(
+        `Can't change status for order ${req.params.id}`,
+        400
+      )
+    );
+  }
+
+  // status can be notAccepted or completed
+  order.status = status;
+  await order.save();
+
+  res.status(200).json({
+    status: 'success',
+    order,
   });
 });

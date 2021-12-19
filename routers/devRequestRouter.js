@@ -33,7 +33,7 @@ router
 
 router
   .route('/manageoffer/:id')
-  .get(restrictTo('buyer'), offersController.manageOffer);
+  .patch(restrictTo('buyer'), offersController.manageOffer);
 
 router.use('/:devRequestId/offers', offersRouter);
 

@@ -1,7 +1,7 @@
 const DevRequest = require('../models/DevRequest');
 const Gig = require('../models/Gig');
 const Offer = require('../models/Offer');
-const Offers = require('../models/Offer');
+const Order = require('../models/Order');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
@@ -40,7 +40,7 @@ exports.getAllOffers = catchAsync(async (req, res, next) => {
       )
     );
 
-  const offers = await Offers.find(req.dataFilter || {});
+  const offers = await Offer.find(req.dataFilter || {});
 
   res.status(200).json({
     status: 'success',
@@ -73,7 +73,7 @@ exports.addNewOffer = catchAsync(async (req, res, next) => {
       new AppError(`No Approved Gig  Found against id ${gigId}`, 404)
     );
 
-  const offer = await Offers.create({
+  const offer = await Offer.create({
     user: req.user._id,
     devRequest: devRequestId,
     description,
@@ -94,7 +94,7 @@ exports.addNewOffer = catchAsync(async (req, res, next) => {
 });
 
 exports.getOffer = catchAsync(async (req, res, next) => {
-  const offers = await Offers.findById(req.params.id);
+  const offers = await Offer.findById(req.params.id);
 
   if (!offers)
     return next(
@@ -113,7 +113,7 @@ exports.manageOffer = catchAsync(async (req, res, next) => {
   const { id } = req.params;
   const { status } = req.body;
 
-  const offer = await Offers.findById(id);
+  const offer = await Offer.findById(id);
   if (!offer)
     return next(new AppError(`Can't find offer for id ${id}`, 404));
 

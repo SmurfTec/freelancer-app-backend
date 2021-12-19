@@ -9,8 +9,16 @@ router.use(protect);
 
 router.route('/').get(orderController.getAllOrders);
 
+router.route('/me').get(orderController.getMyOrders);
+
 router.route('/:id').get(orderController.getOrder);
 
-router.use('/manageorder/:id', orderController.manageorder);
+router
+  .route('/deliverorder/:id')
+  .patch(restrictTo('seller'), orderController.deliverOrder);
+
+router
+  .route('/manageorder/:id')
+  .patch(restrictTo('buyer'), orderController.manageOrder);
 
 module.exports = router;
