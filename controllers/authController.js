@@ -7,6 +7,7 @@ const sendMail = require('../utils/email');
 const Freelancer = require('../models/Freelancer');
 
 const signToken = (id) => {
+  console.log(`id`, id);
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     // payload + secret + expire time
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -15,12 +16,15 @@ const signToken = (id) => {
 
 const createsendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
+  console.log(`token`, token);
   // Remove the password from output
-  user.password = undefined;
+  console.log(`user`, user);
+  let resUser = user.toObject();
+  resUser.password = undefined;
+
   res.status(statusCode).json({
     status: 'success',
-    token,
-    user,
+    user: resUser,
   });
 };
 
