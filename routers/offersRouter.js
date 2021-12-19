@@ -11,7 +11,11 @@ router.use(protect);
 
 router
   .route('/')
-  .get(offersController.setDevRequestId, offersController.getAllOffers)
+  .get(
+    restrictTo('buyer'),
+    offersController.setDevRequestId,
+    offersController.getAllOffers
+  )
   .post(
     isVerified,
     restrictTo('seller'),
@@ -19,20 +23,17 @@ router
     offersController.addNewOffer
   );
 
+//!  ?
 router.get(
   '/me',
   (req, res, next) => {
     req.dataFilter = { user: req.user._id };
     next();
   },
+
   offersController.getAllOffers
 );
 
-router
-  .route('/:id')
-  .get(offersController.getOffer)
-  // .patch(offersController.updateOffer)
-  // ! either we validate that dont updateOffer if it is accepter or we dont allow user to update offer
-  .delete(offersController.deleteOffer);
+router.route('/:id').get(offersController.getOffer);
 
 module.exports = router;

@@ -15,6 +15,7 @@ const categoryRouter = require('./routers/categoryRouter');
 const subCategoryRouter = require('./routers/subCategoryRouter');
 const offersRouter = require('./routers/offersRouter');
 const gigRouter = require('./routers/gigRouter');
+const orderRouter = require('./routers/orderRouter');
 
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 
@@ -79,9 +80,10 @@ app.use((req, res, next) => {
 
 app.use('/api/users', userRouter);
 app.use('/api/auth', authRoutes);
+app.use('/api/gigs', gigRouter);
 app.use('/api/devRequests', devRequestsRouter);
 app.use('/api/offers', offersRouter);
-app.use('/api/gigs', gigRouter);
+app.use('/api/orders', orderRouter);
 app.use('/api/categories', categoryRouter);
 app.use('/api/subCategories', subCategoryRouter);
 

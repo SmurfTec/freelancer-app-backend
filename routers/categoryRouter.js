@@ -7,11 +7,12 @@ const subCategoryRouter = require('../routers/subCategoryRouter');
 
 const router = express.Router();
 
-router.route('/').get(categoryController.getAllCategories);
-
 router.use(protect);
 
-router.route('/').post(restrictTo('admin'), categoryController.addNewCategory);
+router
+  .route('/')
+  .get(categoryController.getAllCategories)
+  .post(restrictTo('admin'), categoryController.addNewCategory);
 
 router
   .route('/:id')

@@ -1,5 +1,6 @@
 const express = require('express');
 const devRequestController = require('../controllers/devRequestController');
+const offersController = require('../controllers/offersController');
 const protect = require('../middlewares/protect');
 const restrictTo = require('../middlewares/restrictTo');
 const offersRouter = require('../routers/offersRouter');
@@ -30,6 +31,10 @@ router
   .get(restrictTo('buyer'), devRequestController.getDevRequest)
   .delete(restrictTo('buyer'), devRequestController.deleteDevRequest);
 
-// router.use('/:devRequestId/offers', offersRouter);
+router
+  .route('/manageoffer/:id')
+  .get(restrictTo('buyer'), offersController.manageOffer);
+
+router.use('/:devRequestId/offers', offersRouter);
 
 module.exports = router;

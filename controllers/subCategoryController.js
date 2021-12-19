@@ -5,8 +5,9 @@ const catchAsync = require('../utils/catchAsync');
 
 exports.checkCategoryId = catchAsync(async (req, res, next) => {
   if (!req.params.categoryId)
-    return next(new AppError('Provide Category Id with request', 400));
-
+    return next(
+      new AppError('Provide Category Id with request', 400)
+    );
   next();
 });
 
@@ -55,7 +56,10 @@ exports.getSubCategory = catchAsync(async (req, res, next) => {
 
   if (!subcategory)
     return next(
-      new AppError(`Can't find subcategory for id ${req.params.id},404`, 404)
+      new AppError(
+        `Can't find subcategory for id ${req.params.id},404`,
+        404
+      )
     );
 
   res.status(200).json({
@@ -76,7 +80,10 @@ exports.updateSubCategory = catchAsync(async (req, res, next) => {
 
   if (!subcategory)
     return next(
-      new AppError(`Can't find subcategory for id ${req.params.id}`, 404)
+      new AppError(
+        `Can't find subcategory for id ${req.params.id}`,
+        404
+      )
     );
 
   res.status(200).json({
@@ -86,11 +93,16 @@ exports.updateSubCategory = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteSubCategory = catchAsync(async (req, res, next) => {
-  const subcategory = await SubCategory.findByIdAndDelete(req.params.id);
+  const subcategory = await SubCategory.findByIdAndDelete(
+    req.params.id
+  );
 
   if (!subcategory)
     return next(
-      new AppError(`Can't find subcategory for id ${req.params.id}`, 404)
+      new AppError(
+        `Can't find subcategory for id ${req.params.id}`,
+        404
+      )
     );
 
   res.status(200).json({

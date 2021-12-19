@@ -10,7 +10,9 @@ exports.setDevRequestId = catchAsync(async (req, res, next) => {
 
   if (!devRequestId)
     return next(
-      new AppError(`Provide Dev Request id with request for its offer`)
+      new AppError(
+        `Provide Dev Request id with request for its offer`
+      )
     );
 
   req.dataFilter = {
@@ -33,7 +35,9 @@ exports.getAllOffers = catchAsync(async (req, res, next) => {
 
   if (!devRequest)
     return next(
-      new AppError(`Can't find Development Request with id ${devRequestId}`)
+      new AppError(
+        `Can't find Development Request with id ${devRequestId}`
+      )
     );
 
   const offers = await Offers.find(req.dataFilter || {});
@@ -52,7 +56,6 @@ exports.addNewOffer = catchAsync(async (req, res, next) => {
   console.log(`devRequestId`, devRequestId);
   const devRequest = await DevRequest.findOne({
     _id: devRequestId,
-    status: 'approved',
   });
   if (!devRequest)
     return next(
@@ -64,7 +67,6 @@ exports.addNewOffer = catchAsync(async (req, res, next) => {
 
   const gig = await Gig.findOne({
     _id: gigId,
-    status: 'approved',
   });
   if (!gig)
     return next(
@@ -95,7 +97,9 @@ exports.getOffer = catchAsync(async (req, res, next) => {
   const offers = await Offers.findById(req.params.id);
 
   if (!offers)
-    return next(new AppError(`Can't find offer for id ${req.params.id}`, 404));
+    return next(
+      new AppError(`Can't find offer for id ${req.params.id}`, 404)
+    );
 
   res.status(200).json({
     status: 'success',
@@ -103,40 +107,33 @@ exports.getOffer = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateOffer = catchAsync(async (req, res, next) => {
-  const offers = await Offers.findOneAndUpdate(
-    {
-      _id: req.params.id,
-      user: req.user._id,
-    },
-    req.body,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+// accept or reject offer in chat by buyer only
 
-  if (!offers)
-    return next(new AppError(`Can't find offer for id ${req.params.id}`, 404));
+exports.manageOffer = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const { status } = req.body;
 
-  res.status(200).json({
-    status: 'success',
-    offers,
-  });
-});
-
-exports.deleteOffer = catchAsync(async (req, res, next) => {
-  let offer;
-  if (req.user.role === 'admin')
-    offer = await Offers.findByIdAndDelete(req.params.id);
-  else
-    offer = await Offers.findOneAndDelete({
-      _id: req.params.id,
-      user: req.user._id,
-    });
-
+  const offer = await Offers.findById(id);
   if (!offer)
-    return next(new AppError(`Can't find offer for id ${req.params.id}`, 404));
+    return next(new AppError(`Can't find offer for id ${id}`, 404));
+
+  offer.status = status;
+  await offer.save();
+
+  if (status === 'accepted') {
+    const days = offer.expectedDays;
+    let deadline = new Date();
+    deadline.setHours(new Date().getHours() + 24 * days);
+
+    // start the order after accepting the offer
+
+    const order = await Order.create({
+      buyer: req.user._id,
+      seller: offer.user,
+      offer: offer,
+      deadline: deadline,
+    });
+  }
 
   res.status(200).json({
     status: 'success',
