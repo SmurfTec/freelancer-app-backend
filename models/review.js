@@ -14,10 +14,6 @@ const reviewSchema = new mongoose.Schema(
       min: [1, 'must be greater than 1'], //   validator
       max: [5, 'must be smaller than 5 '], //  validator
     },
-    created_At: {
-      type: Date,
-      default: Date.now,
-    },
     buyer: {
       type: mongoose.Schema.ObjectId,
       ref: 'Freelancer',

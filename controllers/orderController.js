@@ -90,6 +90,14 @@ exports.manageOrder = catchAsync(async (req, res, next) => {
     );
   }
 
+  if (order.status === 'completed') {
+    //* create a review
+    const review = await Review.create({});
+
+    //* find a gig and calculate average and quantity
+
+    //* and find a user and calculate average and quantity of all the gigs
+  }
   // status can be notAccepted or completed
   order.status = status;
   await order.save();
