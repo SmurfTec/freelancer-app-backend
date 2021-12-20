@@ -8,8 +8,8 @@ const catchAsync = require('../utils/catchAsync');
 exports.createDevRequest = catchAsync(async (req, res, next) => {
   const devrequest = await DevRequest.create({
     ...req.body,
-    category: req.body.categoryId,
-    subCategory: req.body.subCategoryId,
+    category: req.body.category,
+    subCategory: req.body.subCategory,
     user: req.user._id,
   });
 
@@ -32,7 +32,7 @@ exports.getAllDevRequests = catchAsync(async (req, res, next) => {
     .populate('category')
     .populate('subCategory');
 
-  const devrequests = await query;
+  const devRequests = await query;
   // .populate({
   //   path: 'offers',
   //   select: '',
@@ -40,14 +40,14 @@ exports.getAllDevRequests = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    results: devrequests.length,
-    devrequests,
+    results: devRequests.length,
+    devRequests,
   });
 });
 
 //* only buyer
 exports.getMyDevRequests = catchAsync(async (req, res, next) => {
-  let devrequests = await DevRequest.find({ user: req.user._id })
+  let devRequests = await DevRequest.find({ user: req.user._id })
     .populate({
       path: 'user',
       select: 'name email photo role',
@@ -57,8 +57,8 @@ exports.getMyDevRequests = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    results: devrequests.length,
-    devrequests,
+    results: devRequests.length,
+    devRequests,
   });
 });
 

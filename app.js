@@ -16,6 +16,7 @@ const subCategoryRouter = require('./routers/subCategoryRouter');
 const offersRouter = require('./routers/offersRouter');
 const gigRouter = require('./routers/gigRouter');
 const orderRouter = require('./routers/orderRouter');
+const offersController = require('./controllers/offersController');
 
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 
@@ -55,8 +56,7 @@ app.use(cors());
 const limiter = rateLimit({
   max: 100, //   max number of limits
   windowMs: 60 * 60 * 1000, // hour
-  message:
-    ' Too many req from this IP , please Try  again in an Hour ! ',
+  message: ' Too many req from this IP , please Try  again in an Hour ! ',
 });
 
 app.use('/api', limiter);
@@ -89,9 +89,7 @@ app.use('/api/subCategories', subCategoryRouter);
 
 // handling all (get,post,update,delete.....) unhandled routes
 app.all('*', (req, res, next) => {
-  next(
-    new AppError(`Can't find ${req.originalUrl} on the server`, 404)
-  );
+  next(new AppError(`Can't find ${req.originalUrl} on the server`, 404));
 });
 
 // error handling middleware

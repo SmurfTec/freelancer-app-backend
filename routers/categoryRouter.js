@@ -7,18 +7,16 @@ const subCategoryRouter = require('../routers/subCategoryRouter');
 
 const router = express.Router();
 
-router.use(protect);
-
 router
   .route('/')
   .get(categoryController.getAllCategories)
-  .post(restrictTo('admin'), categoryController.addNewCategory);
+  .post(protect, restrictTo('admin'), categoryController.addNewCategory);
 
 router
   .route('/:id')
   .get(categoryController.getCategory)
-  .patch(restrictTo('admin'), categoryController.updateCategory)
-  .delete(restrictTo('admin'), categoryController.deleteCategory);
+  .patch(protect, restrictTo('admin'), categoryController.updateCategory)
+  .delete(protect, restrictTo('admin'), categoryController.deleteCategory);
 
 router.use('/:categoryId/subcategories', subCategoryRouter);
 module.exports = router;

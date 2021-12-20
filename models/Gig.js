@@ -66,7 +66,9 @@ const gigSchema = new mongoose.Schema(
 
 gigSchema.pre(/^find/, function (next) {
   // this points to current query
-  this.sort('-createdAt');
+  this.sort('-createdAt')
+    .populate({ path: 'category', select: 'title' })
+    .populate('subCategory');
   next();
 });
 

@@ -4,17 +4,15 @@ const offersController = require('../controllers/offersController');
 const protect = require('../middlewares/protect');
 const restrictTo = require('../middlewares/restrictTo');
 const offersRouter = require('../routers/offersRouter');
-const {
-  validateCategories,
-} = require('../middlewares/validateCategories');
+const { validateCategories } = require('../middlewares/validateCategories');
 
 const router = express.Router();
-router.use(protect);
 
 router
   .route('/')
-  .get(restrictTo('seller'), devRequestController.getAllDevRequests)
+  .get(devRequestController.getAllDevRequests)
   .post(
+    protect,
     restrictTo('buyer'),
     validateCategories,
     devRequestController.createDevRequest
@@ -22,18 +20,19 @@ router
 
 router.get(
   '/me',
+  protect,
   restrictTo('buyer'),
   devRequestController.getMyDevRequests
 );
 
 router
   .route('/:id')
-  .get(restrictTo('buyer'), devRequestController.getDevRequest)
-  .delete(restrictTo('buyer'), devRequestController.deleteDevRequest);
+  .get(devRequestController.getDevRequest)
+  .delete(protect, restrictTo('buyer'), devRequestController.deleteDevRequest);
 
 router
   .route('/manageoffer/:id')
-  .patch(restrictTo('buyer'), offersController.manageOffer);
+  .patch(protect, restrictTo('buyer'), offersController.manageOffer);
 
 router.use('/:devRequestId/offers', offersRouter);
 
