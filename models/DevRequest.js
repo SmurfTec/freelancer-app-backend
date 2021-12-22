@@ -38,7 +38,10 @@ const DevRequestSchema = new mongoose.Schema(
         message: `Expected Days can't be less than 1 day`,
       },
     },
-    files: [String],
+   image: {
+      id: String,
+      url: String,
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Category',

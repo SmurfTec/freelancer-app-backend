@@ -5,6 +5,7 @@ const protect = require('../middlewares/protect');
 const restrictTo = require('../middlewares/restrictTo');
 const offersRouter = require('../routers/offersRouter');
 const { validateCategories } = require('../middlewares/validateCategories');
+const upload = require('../middlewares/multerUpload');
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router
   .post(
     protect,
     restrictTo('buyer'),
+    upload.single('image'),
     validateCategories,
     devRequestController.createDevRequest
   );

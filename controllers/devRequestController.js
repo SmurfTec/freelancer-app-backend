@@ -3,14 +3,25 @@ const DevRequest = require('../models/DevRequest');
 const SubCategory = require('../models/SubCategory');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const cloudinary = require('../utils/cloudinary');
 
 //* only buyer
 exports.createDevRequest = catchAsync(async (req, res, next) => {
+  if (!req.file.path)
+    return next(new AppError(`Provide Image with Request`), 400);
+
+  const result = await cloudinary.uploader.upload(req.file.path);
+  console.log(`result`, result);
+
   const devrequest = await DevRequest.create({
     ...req.body,
     category: req.body.category,
     subCategory: req.body.subCategory,
     user: req.user._id,
+    image: {
+      url: result.secure_url,
+      id: result.public_id,
+    },
   });
 
   res.status(201).json({
