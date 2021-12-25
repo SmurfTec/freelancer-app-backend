@@ -15,6 +15,7 @@ const categoryRouter = require('./routers/categoryRouter');
 const subCategoryRouter = require('./routers/subCategoryRouter');
 const offersRouter = require('./routers/offersRouter');
 const gigRouter = require('./routers/gigRouter');
+const chatRouter = require('./routers/chatRouter');
 const orderRouter = require('./routers/orderRouter');
 const offersController = require('./controllers/offersController');
 
@@ -53,13 +54,13 @@ if (process.env.NODE_ENV === 'development') {
 app.use(cors());
 
 //  set limit request from same API in timePeroid from same ip
-const limiter = rateLimit({
-  max: 100, //   max number of limits
-  windowMs: 60 * 60 * 1000, // hour
-  message: ' Too many req from this IP , please Try  again in an Hour ! ',
-});
+// const limiter = rateLimit({
+//   max: 100, //   max number of limits
+//   windowMs: 60 * 60 * 1000, // hour
+//   message: ' Too many req from this IP , please Try  again in an Hour ! ',
+// });
 
-app.use('/api', limiter);
+// app.use('/api', limiter);
 
 //  Body Parser  => reading data from body into req.body protect from scraping etc
 app.use(express.json({ limit: '10kb' }));
@@ -86,6 +87,7 @@ app.use('/api/offers', offersRouter);
 app.use('/api/orders', orderRouter);
 app.use('/api/categories', categoryRouter);
 app.use('/api/subCategories', subCategoryRouter);
+app.use('/api/chats', chatRouter);
 
 // handling all (get,post,update,delete.....) unhandled routes
 app.all('*', (req, res, next) => {

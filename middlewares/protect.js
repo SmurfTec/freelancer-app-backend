@@ -17,20 +17,13 @@ module.exports = catchAsync(async (req, res, next) => {
   if (!token) {
     return next(new AppError('you are not login ', 401));
   }
-  console.log(`process.env.JWT_SECRET`, process.env.JWT_SECRET);
   // 2- validate the token
-  const decode = await promisify(jwt.verify)(
-    token,
-    process.env.JWT_SECRET
-  );
+  const decode = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
   // 3- check user exits
   const currentUser = await User.findById(decode.id);
   if (!currentUser) {
     return next(
-      new AppError(
-        'the user belong to this token does not exists ',
-        401
-      )
+      new AppError('the user belong to this token does not exists ', 401)
     );
   }
 

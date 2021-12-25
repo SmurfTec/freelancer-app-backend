@@ -24,10 +24,10 @@ const messageSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// this.pre(/^find/, function (next) {
-//  this.populate({ path: '' });
-//  next();
-// });
+messageSchema.pre(/^find/, function (next) {
+  this.populate({ path: 'sender', select: 'fullName photo' });
+  next();
+});
 
 const Message = mongoose.model('Message', messageSchema);
 module.exports = Message;

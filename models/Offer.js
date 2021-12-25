@@ -16,10 +16,10 @@ const offerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'DevRequest',
     },
-    gig: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Gig',
-    },
+    // gig: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: 'Gig',
+    // },
     budget: {
       type: Number,
       required: [true, 'A Development Request Must have a Budget'],
@@ -32,10 +32,7 @@ const offerSchema = new mongoose.Schema(
     },
     expectedDays: {
       type: Number,
-      required: [
-        true,
-        'A Development Request Must have Expected Days',
-      ],
+      required: [true, 'A Development Request Must have Expected Days'],
       validate: {
         validator: function (el) {
           return el >= 1;

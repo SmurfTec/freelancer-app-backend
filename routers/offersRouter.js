@@ -20,11 +20,7 @@ router.route('/:id').get(offersController.getOffer);
 
 router
   .route('/')
-  .get(
-    restrictTo('buyer'),
-    offersController.setDevRequestId,
-    offersController.getAllOffers
-  )
+  .get(offersController.setDevRequestId, offersController.getAllOffers)
   .post(
     isVerified,
     restrictTo('seller'),

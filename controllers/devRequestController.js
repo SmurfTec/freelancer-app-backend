@@ -38,7 +38,7 @@ exports.getAllDevRequests = catchAsync(async (req, res, next) => {
   query
     .populate({
       path: 'user',
-      select: 'name email photo role',
+      select: 'fullName email photo role',
     })
     .populate('category')
     .populate('subCategory');
@@ -61,7 +61,7 @@ exports.getMyDevRequests = catchAsync(async (req, res, next) => {
   let devRequests = await DevRequest.find({ user: req.user._id })
     .populate({
       path: 'user',
-      select: 'name email photo role',
+      select: 'fullName email photo role',
     })
     .populate('category')
     .populate('subCategory');
@@ -84,7 +84,7 @@ exports.getDevRequest = catchAsync(async (req, res, next) => {
     // const devrequest = await DevRequest.findById({ _id: id })
     .populate({
       path: 'user',
-      select: 'name email photo role',
+      select: 'fullName email photo role',
     })
     .populate('category')
     .populate('subCategory');

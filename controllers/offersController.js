@@ -23,6 +23,8 @@ exports.setDevRequestId = catchAsync(async (req, res, next) => {
 exports.getMyOffers = catchAsync(async (req, res, next) => {
   const offers = await Offer.find({
     user: req.user._id,
+  }).populate({
+    path: 'devRequest',
   });
 
   res.status(200).json({
@@ -58,7 +60,7 @@ exports.getAllOffers = catchAsync(async (req, res, next) => {
 });
 
 exports.addNewOffer = catchAsync(async (req, res, next) => {
-  const { description, budget, expectedDays, gigId } = req.body;
+  const { description, budget, expectedDays } = req.body;
   const { devRequestId } = req.params;
 
   console.log(`devRequestId`, devRequestId);
@@ -71,14 +73,6 @@ exports.addNewOffer = catchAsync(async (req, res, next) => {
         `No Approved Development Request Found against id ${devRequestId}`,
         404
       )
-    );
-
-  const gig = await Gig.findOne({
-    _id: gigId,
-  });
-  if (!gig)
-    return next(
-      new AppError(`No Approved Gig  Found against id ${gigId}`, 404)
     );
 
   // * If already made offer on that devReq, then restrict him
@@ -97,7 +91,6 @@ exports.addNewOffer = catchAsync(async (req, res, next) => {
     description,
     budget,
     expectedDays,
-    gig: gigId,
   });
 
   await Offer.populate(offer, 'devRequest');

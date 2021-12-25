@@ -45,24 +45,16 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   let updatedUser;
   if (req.user.__type === 'Freelancer') {
     console.log('freelancer');
-    updatedUser = await Freelancer.findByIdAndUpdate(
-      req.user._id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    updatedUser = await Freelancer.findByIdAndUpdate(req.user._id, req.body, {
+      new: true,
+      runValidators: true,
+    });
   } else {
     // console.log('user');
-    updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    updatedUser = await User.findByIdAndUpdate(req.user._id, req.body, {
+      new: true,
+      runValidators: true,
+    });
   }
 
   if (!updatedUser)
@@ -77,12 +69,12 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.getUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id).populate({
+    path: 'gigs',
+  });
 
   if (!user)
-    return next(
-      new AppError(`No User found against id ${req.params.id}`, 404)
-    );
+    return next(new AppError(`No User found against id ${req.params.id}`, 404));
 
   res.status(200).json({
     status: 'success',
@@ -94,9 +86,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   const deletedUser = await User.findByIdAndDelete(req.params.id);
 
   if (!deletedUser)
-    return next(
-      new AppError(`No User found against id ${req.params.id}`, 404)
-    );
+    return next(new AppError(`No User found against id ${req.params.id}`, 404));
 
   res.status(200).json({
     status: 'success',
@@ -114,8 +104,7 @@ exports.manageVerification = catchAsync(async (req, res, next) => {
   // console.log('status :>> ', status);
 
   const user = await User.findById(id);
-  if (!user)
-    return next(new AppError(`No User found against id ${id}`, 404));
+  if (!user) return next(new AppError(`No User found against id ${id}`, 404));
 
   user.status = status;
   await user.save();
