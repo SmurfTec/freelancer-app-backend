@@ -7,14 +7,16 @@ const verifyUser = require('./utils/verifyUser');
 
 process.on('uncaughtException', (error) => {
   // using uncaughtException event
-  console.log(' uncaught Exception => shutting down..... ');
-  console.log(error.name, error.message);
+  // console.log(' uncaught Exception => shutting down..... ');
+  // console.log(error.name, error.message);
   process.exit(1); //  emidiatly exists all from all the requests
 });
 
 const app = require('./app');
 const Chat = require('./models/Chat');
 const Message = require('./models/Message');
+const Offer = require('./models/Offer');
+const Order = require('./models/Order');
 
 // database connection
 DBConnect();
@@ -22,31 +24,31 @@ DBConnect();
 // server
 const port = process.env.PORT || 7000;
 const server = app.listen(port, () => {
-  console.log(`App is running on port ${port}`.yellow.bold);
+  // console.log(`App is running on port ${port}`.yellow.bold);
 });
 
 const io = socketIo(server);
 
 io.on('connection', (socket) => {
-  console.log(`Connection created with socket ${socket.id}`.cyan);
+  // console.log(`Connection created with socket ${socket.id}`.cyan);
   socket.emit('me', socket.id);
 
   socket.on('newMessage', async (data) => {
-    console.log('*****');
-    console.log('*****');
-    console.log('*****');
-    console.log(`data`, data);
+    // console.log('*****');
+    // console.log('*****');
+    // console.log('*****');
+    // console.log(`data`, data);
     const { token, text, chatId } = data;
     try {
       // * Verify Token
       const loggedUser = await verifyUser(token);
-      console.log(`loggedUser`, loggedUser);
+      // console.log(`loggedUser`, loggedUser);
 
       // * Find Chat
 
       let chat = await Chat.findById(chatId);
-      console.log(`chatId`, chatId);
-      console.log(`chat`, chat);
+      // console.log(`chatId`, chatId);
+      // console.log(`chat`, chat);
       if (!chat) return;
 
       // * Create New Message
@@ -55,20 +57,20 @@ io.on('connection', (socket) => {
         sender: loggedUser._id,
       });
 
-      console.log(`newMessage`, newMessage);
+      // console.log(`newMessage`, newMessage);
 
       // * Push new Message to Chat Messages
       chat.messages = [...chat.messages, newMessage._id];
       await chat.save();
 
       // * Receiver will the 2nd participant of chat
-      console.log(` chat.participants[0]._id`, chat.participants[0]._id);
+      // console.log(` chat.participants[0]._id`, chat.participants[0]._id);
       const receiver =
         chat.participants[0]._id.toString() === loggedUser._id.toString()
           ? chat.participants[1]
           : chat.participants[0];
 
-      console.log(`receiver`, receiver);
+      // console.log(`receiver`, receiver);
 
       await Chat.populate(chat, {
         path: 'participants',
@@ -92,49 +94,45 @@ io.on('connection', (socket) => {
 
       // console.log(`updatedChat`, chat);
     } catch (err) {
-      console.log(`err ${err}`.bgWhite.red.bold);
+      // console.log(`err ${err}`.bgWhite.red.bold);
     }
   });
-  socket.on('newAgreement', async (data) => {
+  socket.on('newOffer', async (data) => {
     // console.log('*****');
     // console.log('*****');
     // console.log('*****');
     // console.log(`data`, data);
-    const { token, agreement, chatId, userId } = data;
-    console.log(`userId`, userId);
-    console.log(`agreement`, agreement);
+    const { token, offer, chatId, userId } = data;
+    // console.log(`userId`, userId);
+    // console.log(`offer`, offer);
     try {
       // * Verify Token
       const loggedUser = await verifyUser(token);
-      console.log(`loggedUser`, loggedUser);
+      // console.log(`loggedUser`, loggedUser);
 
       // * Find Chat
-
       let chat = await Chat.findById(chatId);
-      console.log(`chatId`, chatId);
-      console.log(`chat`, chat);
+      // console.log(`chatId`, chatId);
+      // console.log(`chat`, chat);
 
-      const newAgreement = await Agreement.create({
-        description: agreement.description,
-        cost: agreement.cost,
-        days: agreement.days,
-        developer: loggedUser._id,
-        user: userId,
+      const newOffer = await Offer.create({
+        description: offer.description,
+        budget: offer.budget,
+        expectedDays: offer.expectedDays,
+        user: loggedUser._id,
       });
 
-      console.log(`newAgreement`, newAgreement);
+      // console.log(`newOffer`, newOffer);
 
       // * Create New Message
 
       const newMessage = await Message.create({
         sender: loggedUser._id,
-        isAgreement: true,
-        agreement: newAgreement._id,
+        isOffer: true,
+        offer: newOffer._id,
       });
-      chat.messages = [...chat.messages, newMessage._id];
-      await chat.save();
 
-      console.log(`newMessage`, newMessage);
+      // console.log(`newMessage`, newMessage);
 
       // * Push new Message to Chat Messages
       chat.messages = [...chat.messages, newMessage._id];
@@ -143,21 +141,22 @@ io.on('connection', (socket) => {
       // * Receiver will the userId
       const receiver = userId;
 
-      console.log(`receiver`, receiver);
+      // console.log(`receiver`, receiver);
 
       await Chat.populate(chat, {
         path: 'participants',
-        select: 'name email',
+        select: 'fullName email photo',
       });
       await Chat.populate(chat, {
         path: 'messages',
-        select: 'name email',
+        select: 'fullName email photo',
       });
       await Message.populate(newMessage, {
         path: 'sender',
+        select: 'fullName email photo',
       });
       await Message.populate(newMessage, {
-        path: 'agreement',
+        path: 'offer',
       });
 
       // * Send new Message to all sockets
@@ -168,24 +167,24 @@ io.on('connection', (socket) => {
         receiver: receiver,
       });
 
-      console.log(`updatedChat`, chat);
+      // console.log(`updatedChat`, chat);
     } catch (err) {
-      console.log(`err ${err}`.bgWhite.red.bold);
+      // console.log(`err ${err}`.bgWhite.red.bold);
     }
   });
-  socket.on('handleAgreement', async (data) => {
+  socket.on('handleOffer', async (data) => {
+    const { token, offerId, messageId, chatId, status } = data;
     // console.log('*****');
     // console.log('*****');
     // console.log('*****');
     // console.log(`data`, data);
-    const { token, agreementId, messageId, chatId, gameId, status } = data;
     // console.log(`userId`, userId);
-    console.log(`status`, status);
-    console.log(`agreementId`, agreementId);
+    // console.log(`status`, status);
+    // console.log(`offerId`, offerId);
     try {
       // * Verify Token
       const loggedUser = await verifyUser(token);
-      console.log(`loggedUser`, loggedUser);
+      // console.log(`loggedUser`, loggedUser);
 
       // * Find Chat
 
@@ -193,12 +192,10 @@ io.on('connection', (socket) => {
       // console.log(`chatId`, chatId);
       // console.log(`chat`, chat);
 
-      const updatedAgreement = await Agreement.findByIdAndUpdate(
-        agreementId,
+      const updatedOffer = await Offer.findByIdAndUpdate(
+        offerId,
         {
           status: status,
-          game: gameId,
-          // deadline : status ==='accepted' ? new Date()
         },
         {
           new: true,
@@ -206,36 +203,48 @@ io.on('connection', (socket) => {
         }
       );
 
-      console.log(`updatedAgreement`, updatedAgreement);
+      let order;
       if (status === 'accepted') {
-        deadline = new Date();
-        deadline.setHours(new Date().getHours() + 24 * updatedAgreement.days);
-        updatedAgreement.deadline = deadline;
-        await updatedAgreement.save();
+        const days = updatedOffer.expectedDays;
+        let deadline = new Date();
+        deadline.setHours(new Date().getHours() + 24 * days);
+
+        // start the order after accepting the offer
+
+        order = await Order.create({
+          buyer: loggedUser._id,
+          seller: updatedOffer.user,
+          offer: updatedOffer._id,
+          deadline: deadline,
+        });
+        // console.log(`order`, order);
       }
 
-      // * Create New Message
+      // console.log(`updatedOffer`, updatedOffer);
+
+      // * Updated Message
       const updatedMessage = await Message.findById(messageId);
-      console.log(`updatedMessage`, updatedMessage);
+      // console.log(`updatedMessage`, updatedMessage);
 
       // * Receiver will the userId
-      const receiver = updatedAgreement.developer._id;
+      const receiver = updatedOffer.user;
 
       // console.log(`receiver`, receiver);
 
       await Chat.populate(chat, {
         path: 'participants',
-        select: 'name email',
+        select: 'fullName photo email',
       });
       await Chat.populate(chat, {
         path: 'messages',
-        select: 'name email',
+        select: 'fullName email photo',
       });
       await Message.populate(updatedMessage, {
         path: 'sender',
+        select: 'fullName email photo',
       });
       await Message.populate(updatedMessage, {
-        path: 'agreement',
+        path: 'offer',
       });
 
       // * Send new Message to all sockets
@@ -248,12 +257,8 @@ io.on('connection', (socket) => {
 
       // console.log(`updatedChat`, chat);
     } catch (err) {
-      console.log(`err ${err}`.bgWhite.red.bold);
+      // console.log(`err ${err}`.bgWhite.red.bold);
     }
-  });
-
-  socket.on('wow', (data) => {
-    // console.log(`wow inside`.blue.bold, data);
   });
 });
 
@@ -262,8 +267,8 @@ io.on('connection', (socket) => {
 process.on('unhandledRejection', (error) => {
   // it uses unhandledRejection event
   // using unhandledRejection event
-  console.log(' Unhandled Rejection => shutting down..... ');
-  console.log(error.name, error.message);
+  // console.log(' Unhandled Rejection => shutting down..... ');
+  // console.log(error.name, error.message);
   server.close(() => {
     process.exit(1); //  emidiatly exists all from all the requests sending OR pending
   });

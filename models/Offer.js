@@ -9,7 +9,7 @@ const offerSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      minlength: [20, 'must NOT be less than or equal to 20'],
+      minlength: [15, 'must NOT be less than or equal to 15'],
     },
     // only in devRequest
     devRequest: {
