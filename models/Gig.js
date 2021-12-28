@@ -42,24 +42,6 @@ const gigSchema = new mongoose.Schema(
         price: Number,
       },
     ],
-    reviews: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Review',
-      },
-    ],
-    //* will be calculated when buyer create a new review on an order
-    ratingsAverage: {
-      type: Number,
-      default: 1,
-      min: [1, 'Rating must be above 1.0'],
-      max: [5, 'Rating must be below 5.0'],
-      set: (val) => Math.round(val * 10) / 10, // 4.666666, 46.6666, 47, 4.7
-    },
-    ratingsQuantity: {
-      type: Number,
-      default: 0,
-    },
   },
   { timestamps: true }
 );
@@ -68,7 +50,12 @@ gigSchema.pre(/^find/, function (next) {
   // this points to current query
   this.sort('-createdAt')
     .populate({ path: 'category', select: 'title' })
-    .populate('subCategory');
+    .populate('subCategory')
+    .populate({
+      path: 'user',
+      select: 'fullName photo reviews ratingsAverage ratingsQuantity ',
+    });
+
   next();
 });
 

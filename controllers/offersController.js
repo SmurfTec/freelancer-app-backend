@@ -45,10 +45,18 @@ exports.getAllOffers = catchAsync(async (req, res, next) => {
     user: req.user._id,
   });
 
-  if (!devRequest)
-    return next(
-      new AppError(`Can't find Development Request with id ${devRequestId}`)
-    );
+  if (!devRequest) {
+    // ! Send the user his offer on this dev Request
+    const userOffer = await Offer.findOne({
+      devRequest: devRequestId,
+      user: req.user._id,
+    });
+
+    return res.status(200).json({
+      status: 'success',
+      offers: [userOffer],
+    });
+  }
 
   const offers = await Offer.find(req.dataFilter || {});
 
@@ -84,6 +92,13 @@ exports.addNewOffer = catchAsync(async (req, res, next) => {
     return next(
       new AppError(`YOu already made offer on that development Request`)
     );
+
+  // * If Already 10 offer made , then restrict him
+  const reqOffers = await Offer.find({
+    devRequest: devRequest._id,
+  });
+  if (reqOffers.length >= 10)
+    return next(new AppError('Only 10 Bids can be made on a job', 400));
 
   const offer = await Offer.create({
     user: req.user._id,

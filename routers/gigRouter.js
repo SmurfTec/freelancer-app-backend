@@ -8,11 +8,10 @@ const { validateCategories } = require('../middlewares/validateCategories');
 
 const router = express.Router({ mergeParams: true });
 
-router.use(protect);
-
-router.get('/mygigs', gigController.myGigs);
+router.get('/mygigs', protect, gigController.myGigs);
 
 router.route('/').get(gigController.getAllGigs).post(
+  protect,
   restrictTo('seller'), //* only seller can create a gig
   isVerified,
   validateCategories,
@@ -22,7 +21,7 @@ router.route('/').get(gigController.getAllGigs).post(
 router
   .route('/:id')
   .get(gigController.getGig)
-  .patch(gigController.updateGig)
-  .delete(gigController.deleteGig);
+  .patch(protect, gigController.updateGig)
+  .delete(protect, gigController.deleteGig);
 
 module.exports = router;

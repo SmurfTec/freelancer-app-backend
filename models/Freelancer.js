@@ -44,6 +44,12 @@ const freelancerSchema = new mongoose.Schema({
   },
 
   activationLink: String,
+  reviews: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Review',
+    },
+  ],
   // select: false, // TODO uncomment it late
 });
 

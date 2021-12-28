@@ -15,13 +15,28 @@ exports.getAllOrders = catchAsync(async (req, res, next) => {
   });
 });
 
+// * how to use $or operator
+//  orders = await Order.find({
+//    $or: [{ buyer: req.user._id }, { seller: req.user._id }],
+//  });
+
 exports.getMyOrders = catchAsync(async (req, res, next) => {
-  const orders = await Order.find({
-    $or: [{ buyer: req.user._id }, { seller: req.user._id }],
-  })
-    .populate('offer')
-    .populate('buyer', 'name photo ')
-    .populate('seller', 'name photo ');
+  // * If loggedUser is now buyer , then those order in which he is buyer
+  let orders = [];
+  if (req.user.role === 'buyer')
+    orders = await Order.find({
+      buyer: req.user._id,
+    })
+      .populate('offer')
+      .populate('buyer', 'fullName photo ')
+      .populate('seller', 'fullName photo ');
+  else
+    orders = await Order.find({
+      seller: req.user._id,
+    })
+      .populate('offer')
+      .populate('buyer', 'fullName photo ')
+      .populate('seller', 'fullName photo ');
 
   res.status(200).json({
     status: 'success',
@@ -33,8 +48,8 @@ exports.getMyOrders = catchAsync(async (req, res, next) => {
 exports.getOrder = catchAsync(async (req, res, next) => {
   const order = await Order.findById(req.params.id)
     .populate('offer')
-    .populate('buyer', 'name photo ')
-    .populate('seller', 'name photo ');
+    .populate('buyer', 'fullName photo ')
+    .populate('seller', 'fullName photo ');
 
   if (!order)
     return next(new AppError(`Can't find Order for id ${req.params.id}`, 404));
@@ -67,6 +82,15 @@ exports.deliverOrder = catchAsync(async (req, res, next) => {
   order.status = 'delivered';
   order.submission = req.body.submission;
   await order.save();
+
+  await Order.populate(order, 'offer');
+
+  await Order.populate(order, { path: 'buyer', select: 'fullName photo' });
+
+  await Order.populate(order, {
+    path: 'seller',
+    select: 'fullName photo',
+  });
 
   res.status(200).json({
     status: 'success',
@@ -111,25 +135,12 @@ exports.manageOrder = catchAsync(async (req, res, next) => {
 
     //* create a review
     orderReview = await Review.create({
-      orderReview,
+      review,
       rating,
       order: order._id,
       buyer: req.user._id,
     });
 
-    //* find a gig and calculate average and quantity
-    const sellerGig = await Gig.findById(order.offer.gig);
-    console.log(`sellerGig1`, sellerGig);
-
-    sellerGig.ratingsQuantity =
-      sellerGig.ratingsQuantity === 0 ? 1 : sellerGig.ratingsQuantity + 1;
-    sellerGig.ratingsAverage =
-      sellerGig.ratingsQuantity === 1
-        ? rating
-        : (sellerGig.ratingsAverage + rating) / sellerGig.ratingsQuantity;
-    console.log(`sellerGig2`, sellerGig);
-
-    await sellerGig.save();
     //* and find a user and calculate average and quantity of all the gigs
     const seller = await Freelancer.findById(order.seller);
     console.log(`seller1`, seller);
@@ -145,6 +156,15 @@ exports.manageOrder = catchAsync(async (req, res, next) => {
 
     await seller.save();
   }
+
+  await Order.populate(order, 'offer');
+
+  await Order.populate(order, { path: 'buyer', select: 'fullName photo' });
+
+  await Order.populate(order, {
+    path: 'seller',
+    select: 'fullName photo',
+  });
 
   res.status(200).json({
     status: 'success',
