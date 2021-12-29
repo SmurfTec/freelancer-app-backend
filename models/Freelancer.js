@@ -6,7 +6,7 @@ const freelancerSchema = new mongoose.Schema({
   about: {
     type: String,
     trim: true,
-    minlength: [20, 'must be greater than 20 characters'],
+    minlength: [10, 'must be greater than 10 characters'],
   },
 
   country: { type: String, trim: true },

@@ -24,19 +24,19 @@ exports.getMyOrders = catchAsync(async (req, res, next) => {
   // * If loggedUser is now buyer , then those order in which he is buyer
   let orders = [];
   if (req.user.role === 'buyer')
-    orders = await Order.find({
+    query = Order.find({
       buyer: req.user._id,
-    })
-      .populate('offer')
-      .populate('buyer', 'fullName photo ')
-      .populate('seller', 'fullName photo ');
+    });
   else
-    orders = await Order.find({
+    query = Order.find({
       seller: req.user._id,
-    })
-      .populate('offer')
-      .populate('buyer', 'fullName photo ')
-      .populate('seller', 'fullName photo ');
+    });
+
+  orders = await query
+    .sort('-deadline -createdAt')
+    .populate('offer')
+    .populate('buyer', 'fullName photo ')
+    .populate('seller', 'fullName photo ');
 
   res.status(200).json({
     status: 'success',

@@ -53,7 +53,8 @@ gigSchema.pre(/^find/, function (next) {
     .populate('subCategory')
     .populate({
       path: 'user',
-      select: 'fullName photo reviews ratingsAverage ratingsQuantity ',
+      select:
+        'fullName photo reviews ratingsAverage ratingsQuantity country createdAt about',
     });
 
   next();
