@@ -18,7 +18,7 @@ const orderSchema = new mongoose.Schema(
     deadline: Date, // * in order accepts , deadline = offer.expectedDays
     status: {
       type: String,
-      enum: ['active', 'delivered', 'notAccepted', 'completed'],
+      enum: ['active', 'delivered', 'incomplete', 'completed'],
       default: 'active',
     },
     // * Payments or maybe payment
