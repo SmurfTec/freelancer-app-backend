@@ -116,7 +116,7 @@ exports.manageOrder = catchAsync(async (req, res, next) => {
   if (!order)
     return next(new AppError(`Can't find Order for id ${req.params.id}`, 404));
 
-  if (order.status !== 'delivered') {
+  if (!['delivered', 'incomplete'].includes(order.status)) {
     return next(
       new AppError(`Can't change status for order ${req.params.id}`, 400)
     );
